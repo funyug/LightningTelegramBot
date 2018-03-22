@@ -50,18 +50,8 @@ func Connect(conn *grpc.ClientConn) *grpc.ClientConn {
 		fatal(err)
 	}
 
-	macConstraints := []macaroons.Constraint{
-		macaroons.TimeoutConstraint(60),
-	}
-
-	// Apply constraints to the macaroon.
-	constrainedMac, err := macaroons.AddConstraints(mac, macConstraints...)
-	if err != nil {
-		fatal(err)
-	}
-
 	// Now we append the macaroon credentials to the dial options.
-	cred := macaroons.NewMacaroonCredential(constrainedMac)
+	cred := macaroons.NewMacaroonCredential(mac)
 	opts = append(opts, grpc.WithPerRPCCredentials(cred))
 
 	conn, err = grpc.Dial("localhost:10009", opts...)

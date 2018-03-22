@@ -4,7 +4,6 @@ import (
 	"google.golang.org/grpc"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"fmt"
-	"os"
 	"BitcoinTelegramBot/lnd"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"time"
@@ -189,6 +188,5 @@ func main() {
 }
 
 func fatal(err error) {
-	log.Println(os.Stderr, "[lncli] %v\n", err)
-	os.Exit(1)
+	log.Fatalf( "[lncli] %v\n", err)
 }
