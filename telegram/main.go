@@ -24,7 +24,7 @@ func InitCommands(b *tb.Bot, c lnrpc.LightningClient) {
 	})
 
 	b.Handle("/list_peers", func(m *tb.Message) {
-		log.Println("Received get_info command")
+		log.Println("Received get_peers command")
 		if UsernameValid(m) {
 			GetPeersHandler(b,c,m)
 		}
@@ -41,6 +41,13 @@ func InitCommands(b *tb.Bot, c lnrpc.LightningClient) {
 		log.Println("Received wallet_balance command")
 		if UsernameValid(m) {
 			WalletBalanceHandler(b,c,m)
+		}
+	})
+
+	b.Handle("/list_chain_txns",func(m *tb.Message) {
+		log.Println("Received list_chain_txns command")
+		if UsernameValid(m) {
+			ListChainTxnsHandler(b,c,m)
 		}
 	})
 
@@ -76,6 +83,20 @@ func InitCommands(b *tb.Bot, c lnrpc.LightningClient) {
 		log.Println("Received generate_invoice command")
 		if UsernameValid(m) {
 			GenerateInvoiceHandler(b,c,m)
+		}
+	})
+
+	b.Handle("/list_invoices",func(m *tb.Message) {
+		log.Println("Received list_invoices command")
+		if UsernameValid(m) {
+			ListInvoicesHandler(b,c,m)
+		}
+	})
+
+	b.Handle("/lookup_invoice",func(m *tb.Message) {
+		log.Println("Received lookup_invoice command")
+		if UsernameValid(m) {
+			LookupInvoice(b,c,m)
 		}
 	})
 

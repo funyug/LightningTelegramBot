@@ -96,6 +96,19 @@ func GetDepositAddress(c lnrpc.LightningClient) (*lnrpc.NewAddressResponse,error
 	return response, err
 }
 
+
+func ListChainTxns(c lnrpc.LightningClient) (*lnrpc.TransactionDetails,error) {
+	req := lnrpc.GetTransactionsRequest{}
+	response, err := c.GetTransactions(context.Background(),&req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
+	}
+	log.Println(response)
+	return response, err
+}
+
+
 func AddInvoice(c lnrpc.LightningClient, value string) (*lnrpc.AddInvoiceResponse,error) {
 	amount,err := strconv.ParseInt(value,10,64)
 	if err != nil {
@@ -179,6 +192,31 @@ func ChannelBalance(c lnrpc.LightningClient) (*lnrpc.ChannelBalanceResponse,erro
 	if err != nil {
 		log.Println(err)
 		return nil,err
+	}
+	log.Println(response)
+	return response, err
+}
+
+
+func ListInvoices(c lnrpc.LightningClient) (*lnrpc.ListInvoiceResponse,error) {
+	req := lnrpc.ListInvoiceRequest{}
+	response, err := c.ListInvoices(context.Background(),&req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
+	}
+	log.Println(response)
+	return response, err
+}
+
+func LookupInvoice(c lnrpc.LightningClient, rHash []byte) (*lnrpc.Invoice,error) {
+	req := &lnrpc.PaymentHash{
+		RHash: rHash,
+	}
+	response, err := c.LookupInvoice(context.Background(),req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
 	}
 	log.Println(response)
 	return response, err

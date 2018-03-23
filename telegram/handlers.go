@@ -10,6 +10,7 @@ import (
 	"io"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"fmt"
+	"time"
 )
 
 
@@ -54,6 +55,26 @@ func NewAddressHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Messag
 		b.Send(m.Sender,err.Error())
 	} else {
 		b.Send(m.Sender, response.Address)
+	}
+}
+
+func ListChainTxnsHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.ListChainTxns(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		transactions_text := ""
+		for i:=1;i<=len(response.Transactions);i++ {
+			transactions_text += strconv.FormatInt(int64(i),10)+":"
+			transactions_text += "\nTx hash: "+response.Transactions[i-1].TxHash
+			transactions_text += "\nConfirmations: "+ strconv.FormatInt(int64(response.Transactions[i-1].NumConfirmations),10)
+			transactions_text += "\nAmount: "+ strconv.FormatInt(int64(response.Transactions[i-1].Amount),10)
+			transactions_text += "\nBlock Height: "+ strconv.FormatInt(int64(response.Transactions[i-1].BlockHeight),10)
+			transactions_text += "\nDest addresses: "+ strings.Join(response.Transactions[i-1].DestAddresses,",")
+			tm := time.Unix(response.Transactions[i-1].TimeStamp, 0)
+			transactions_text += "\nTime: "+ tm.String() +"\n"
+		}
+		b.Send(m.Sender,transactions_text)
 	}
 }
 
@@ -180,6 +201,39 @@ func GenerateInvoiceHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.M
 		b.Send(m.Sender,err.Error())
 	} else {
 		b.Send(m.Sender, response.PaymentRequest)
+	}
+}
+
+
+func ListInvoicesHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.ListInvoices(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		invoice_text := ""
+		for i:=1;i<=len(response.Invoices);i++ {
+			invoice_text += strconv.FormatInt(int64(i),10)+":"
+			invoice_text += "\nMemo: "+response.Invoices[i-1].Memo
+			invoice_text += "\nAmount: "+strconv.FormatInt(response.Invoices[i-1].Value,10)
+			invoice_text += "\nSettled: "+strconv.FormatBool(response.Invoices[i-1].Settled)
+			invoice_text += "\nRhash: "+hex.EncodeToString(response.Invoices[i-1].RHash)
+			invoice_text += "\nPay_req: "+response.Invoices[i-1].PaymentRequest+"\n\n"
+		}
+		b.Send(m.Sender,invoice_text)
+	}
+}
+
+func LookupInvoice(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.LookupInvoice(c,[]byte(m.Payload))
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		invoice_text := ""
+		invoice_text += "Memo: "+response.Memo
+		invoice_text += "Amount: "+strconv.FormatInt(response.Value,10)
+		invoice_text += "Settled: "+strconv.FormatBool(response.Settled)
+		invoice_text += "Pay_req: "+response.PaymentRequest+"\n"
+		b.Send(m.Sender,invoice_text)
 	}
 }
 
