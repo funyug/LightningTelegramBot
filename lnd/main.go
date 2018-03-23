@@ -72,6 +72,18 @@ func GetInfo(c lnrpc.LightningClient) (*lnrpc.GetInfoResponse,error) {
 	return response, err
 }
 
+func ListPeers(c lnrpc.LightningClient) (*lnrpc.ListPeersResponse,error) {
+	req := lnrpc.ListPeersRequest{}
+	response, err := c.ListPeers(context.Background(),&req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
+	}
+	log.Println(response)
+	return response, err
+}
+
+
 
 func GetDepositAddress(c lnrpc.LightningClient) (*lnrpc.NewAddressResponse,error) {
 	req := lnrpc.NewWitnessAddressRequest{}

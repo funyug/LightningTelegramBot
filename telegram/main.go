@@ -16,6 +16,20 @@ func UsernameValid(m *tb.Message) bool {
 
 func InitCommands(b *tb.Bot, c lnrpc.LightningClient) {
 
+	b.Handle("/get_info", func(m *tb.Message) {
+		log.Println("Received get_info command")
+		if UsernameValid(m) {
+			GetInfoHandler(b,c,m)
+		}
+	})
+
+	b.Handle("/list_peers", func(m *tb.Message) {
+		log.Println("Received get_info command")
+		if UsernameValid(m) {
+			GetPeersHandler(b,c,m)
+		}
+	})
+
 	b.Handle("/get_address", func(m *tb.Message) {
 		log.Println("Received get_address command")
 		if UsernameValid(m) {

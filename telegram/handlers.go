@@ -12,6 +12,42 @@ import (
 	"fmt"
 )
 
+
+func GetInfoHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.GetInfo(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		node_pub_key_text := "Node key: "+response.IdentityPubkey
+		active_channel_text := "\nActive Channels: "+strconv.FormatInt(int64(response.NumActiveChannels),10)
+		pending_channel_text := "\nPending Channels: "+strconv.FormatInt(int64(response.NumPendingChannels),10)
+		total_peers_text :="\nTotal Peers: "+strconv.FormatInt(int64(response.NumPeers),10)
+		block_height_text := "\nBlock Height: "+strconv.FormatInt(int64(response.BlockHeight),10)
+		uri_text := "\nURIs:\n"
+		for i:=1;i<=len(response.Uris);i++ {
+			uri_text += strconv.FormatInt(int64(i),10)+":"
+			uri_text += "\n "+response.Uris[i-1]+"\n"
+		}
+		b.Send(m.Sender, node_pub_key_text+active_channel_text+pending_channel_text+total_peers_text+block_height_text+uri_text)
+	}
+}
+
+func GetPeersHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.ListPeers(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		peers_text := ""
+		for i:=1;i<=len(response.Peers);i++ {
+			peers_text += strconv.FormatInt(int64(i),10)+":"
+			peers_text += "\nNode key: "+response.Peers[i-1].PubKey
+			peers_text += "\nAddress: "+response.Peers[i-1].Address+"\n"
+		}
+		b.Send(m.Sender,peers_text)
+	}
+}
+
+
 func NewAddressHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
 	response,err := lnd.GetDepositAddress(c)
 	if err != nil {

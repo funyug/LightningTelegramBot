@@ -35,12 +35,6 @@ func main() {
 	telegram.InitCommands(bot,client)
 
 	log.Println("Server started..")
-	response,err := lnd.GetInfo(client)
-	if err != nil {
-		config.Fatal(err)
-	} else {
-		log.Println(response)
-	}
 	bot.Start()
 
 }
