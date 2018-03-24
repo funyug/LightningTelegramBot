@@ -327,3 +327,25 @@ func ListChannelsHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Mess
 	}
 }
 
+func HelpHandler(b *telebot.Bot, m *telebot.Message) {
+	help_text := ""
+	help_text += "Commands:\n"
+	help_text += "\\get_info: Receive info about your node\n\n"
+	help_text += "\\wallet_balance: Receive onchain balance\n\n"
+	help_text += "\\channel_balance: Receive channel balance\n\n"
+	help_text += "\\list_chain_txns: Receive onchain transaction list\n\n"
+	help_text += "\\get_address: Receive new deposit address\n\n"
+	help_text += "\\send_coins <address> <amount>: Sends coins onchain to the specified address\n\n"
+	help_text += "\\connect_peer <node_pubkey@address:port>: Connects to the peer\n\n"
+	help_text += "\\list_peers: Receive list of all peers\n\n"
+	help_text += "\\open_channel <pub_key> <amount>: Opens a channel with the specified node. Make sure you are connected to the node first\n\n"
+	help_text += "\\generate_invoice <amount>: Generates an invoice and returns the payment_req\n\n"
+	help_text += "\\send_payment <payment_req>: Send payment over lightning network\n\n"
+	help_text += "\\list_invoices: Receive list of invoices\n\n"
+	help_text += "\\list_payments: Receive list of payments made over lightning\n\n"
+	help_text += "\\close_channel <funding_tx_id> <index>: Close an active channel\n\n"
+	help_text += "\\list_channels: Receive list of channels\n\n"
+	help_text += "\\lookup_invoice <payment_hash>: Lookup details about an invoice by its payment_hash\n\n"
+
+	b.Send(m.Sender, help_text)
+}

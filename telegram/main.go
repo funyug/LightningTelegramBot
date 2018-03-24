@@ -16,6 +16,13 @@ func UsernameValid(message *tb.Message) bool {
 
 func InitCommands(bot *tb.Bot, client lnrpc.LightningClient) {
 
+	bot.Handle("/help",func(message *tb.Message) {
+		log.Println("Received help command")
+		if UsernameValid(message) {
+			HelpHandler(bot,message)
+		}
+	})
+
 	bot.Handle("/get_info", func(message *tb.Message) {
 		log.Println("Received get_info command")
 		if UsernameValid(message) {
