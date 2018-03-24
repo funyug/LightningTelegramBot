@@ -5,7 +5,6 @@
 Features
 * Commands: wallet_balance, channel_balance, get_address, list_chain_txns, send_coins, open_channel, generate_invoice, list_invoices, lookup_invoice, send_payment, list_payments, close_channel, list_channels
 * Bot responds only to the username specified in the argument
-* OpenChannel commands uses streaming api that provides update in realtime about channel status
 
 TODO
 * Refactor code
