@@ -218,6 +218,13 @@ func ListInvoicesHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Mess
 			invoice_text += "\nSettled: "+strconv.FormatBool(response.Invoices[i-1].Settled)
 			invoice_text += "\nRhash: "+hex.EncodeToString(response.Invoices[i-1].RHash)
 			invoice_text += "\nPay_req: "+response.Invoices[i-1].PaymentRequest+"\n\n"
+			tm := time.Unix(response.Invoices[i-1].CreationDate, 0)
+			invoice_text += "\nCreation Date: "+tm.String()
+
+			if response.Invoices[i-1].Settled {
+				tm := time.Unix(response.Invoices[i-1].SettleDate, 0)
+				invoice_text += "\nSettle Date: "+tm.String()
+			}
 		}
 		b.Send(m.Sender,invoice_text)
 	}
@@ -230,11 +237,93 @@ func LookupInvoice(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
 	} else {
 		invoice_text := ""
 		invoice_text += "Memo: "+response.Memo
-		invoice_text += "Amount: "+strconv.FormatInt(response.Value,10)
-		invoice_text += "Settled: "+strconv.FormatBool(response.Settled)
-		invoice_text += "Pay_req: "+response.PaymentRequest+"\n"
+		invoice_text += "\nAmount: "+strconv.FormatInt(response.Value,10)
+		invoice_text += "\nSettled: "+strconv.FormatBool(response.Settled)
+		invoice_text += "\nPay_req: "+response.PaymentRequest
+		tm := time.Unix(response.CreationDate, 0)
+		invoice_text += "\nCreation Date: "+tm.String()
+		if response.Settled {
+			tm := time.Unix(response.SettleDate, 0)
+			invoice_text += "\nSettle Date: "+tm.String()
+		}
+
 		b.Send(m.Sender,invoice_text)
 	}
 }
 
+func ListPaymentsHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.ListPayments(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		payment_text := ""
+		for i:=1;i<=len(response.Payments);i++ {
+			payment_text += strconv.FormatInt(int64(i),10)+":"
+			payment_text += "\nValue: "+ strconv.FormatInt(int64(response.Payments[i-1].Value),10)
+			payment_text += "\nPayment Hash: "+response.Payments[i-1].PaymentHash
+			payment_text += "\nFee: "+ strconv.FormatInt(int64(response.Payments[i-1].Fee),10)
+			tm := time.Unix(response.Payments[i-1].CreationDate, 0)
+			payment_text += "\nCreation Date: "+tm.String()+"\n\n"
+		}
+		b.Send(m.Sender,payment_text)
+	}
+}
+
+func CloseChannelHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	data := strings.Split(m.Payload," ")
+	if len(data) < 2 {
+		b.Send(m.Sender,"Please provide funding_tx_id and channel index separated by a space")
+		return
+	}
+	response,err := lnd.CloseChannel(c,data[0],data[1])
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+		return
+	} else {
+		for {
+			resp, err := response.Recv()
+			if err == io.EOF {
+				return
+			} else if err != nil {
+				b.Send(m.Sender,err.Error())
+				return
+			}
+
+			switch update := resp.Update.(type) {
+			case *lnrpc.CloseStatusUpdate_ClosePending:
+				closingHash := update.ClosePending.Txid
+				txid, err := chainhash.NewHash(closingHash)
+				if err != nil {
+					b.Send(m.Sender,err.Error())
+					return
+				}
+
+				b.Send(m.Sender,txid.String())
+
+			case *lnrpc.CloseStatusUpdate_ChanClose:
+				return
+			}
+		}
+	}
+}
+
+func ListChannelsHandler(b *telebot.Bot,c lnrpc.LightningClient, m *telebot.Message) {
+	response,err := lnd.ListChannels(c)
+	if err != nil {
+		b.Send(m.Sender,err.Error())
+	} else {
+		channels_text := ""
+		for i:=1;i<=len(response.Channels);i++ {
+			channels_text += strconv.FormatInt(int64(i),10)+":"
+			channels_text += "\nActive: " + strconv.FormatBool(response.Channels[i-1].Active)
+			channels_text += "\nRemote Pubkey: " + response.Channels[i-1].RemotePubkey
+			channels_text += "\nChannel Point: " + response.Channels[i-1].ChannelPoint
+			channels_text += "\nCapacity: " + strconv.FormatInt(response.Channels[i-1].Capacity,10)
+			channels_text += "\nLocal Balance: " + strconv.FormatInt(response.Channels[i-1].LocalBalance,10)
+			channels_text += "\nRemote Balance: " + strconv.FormatInt(response.Channels[i-1].RemoteBalance,10)
+			channels_text += "\nNumber of Updates: " + strconv.FormatUint(response.Channels[i-1].NumUpdates,10)
+		}
+		b.Send(m.Sender,channels_text)
+	}
+}
 

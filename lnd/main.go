@@ -221,3 +221,46 @@ func LookupInvoice(c lnrpc.LightningClient, rHash []byte) (*lnrpc.Invoice,error)
 	log.Println(response)
 	return response, err
 }
+
+func ListPayments(c lnrpc.LightningClient) (*lnrpc.ListPaymentsResponse,error) {
+	req := lnrpc.ListPaymentsRequest{}
+	response, err := c.ListPayments(context.Background(),&req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
+	}
+	log.Println(response)
+	return response, err
+}
+
+func CloseChannel(c lnrpc.LightningClient, funding_tx_id string,index string) (lnrpc.Lightning_CloseChannelClient,error) {
+	req := &lnrpc.CloseChannelRequest{}
+	req.ChannelPoint.FundingTxid = &lnrpc.ChannelPoint_FundingTxidStr{
+		FundingTxidStr: funding_tx_id,
+	}
+
+	channel_index,err := strconv.ParseUint(index,10,64)
+	if err != nil {
+		log.Println(err)
+		return nil,err
+	}
+
+	req.ChannelPoint.OutputIndex = uint32(channel_index)
+	stream, err := c.CloseChannel(context.Background(),req);
+	if err != nil {
+		log.Println(err)
+		return nil,err
+	}
+	return stream, err
+}
+
+func ListChannels(c lnrpc.LightningClient) (*lnrpc.ListChannelsResponse,error) {
+	req := lnrpc.ListChannelsRequest{}
+	response, err := c.ListChannels(context.Background(),&req);
+	if err != nil {
+		return nil,err
+		log.Println(err)
+	}
+	log.Println(response)
+	return response, err
+}

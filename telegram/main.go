@@ -7,96 +7,117 @@ import (
 	"BitcoinTelegramBot/config"
 )
 
-func UsernameValid(m *tb.Message) bool {
-	if m.Sender.Username == config.Username {
+func UsernameValid(message *tb.Message) bool {
+	if message.Sender.Username == config.Username {
 		return true
 	}
 	return false
 }
 
-func InitCommands(b *tb.Bot, c lnrpc.LightningClient) {
+func InitCommands(bot *tb.Bot, client lnrpc.LightningClient) {
 
-	b.Handle("/get_info", func(m *tb.Message) {
+	bot.Handle("/get_info", func(message *tb.Message) {
 		log.Println("Received get_info command")
-		if UsernameValid(m) {
-			GetInfoHandler(b,c,m)
+		if UsernameValid(message) {
+			GetInfoHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/list_peers", func(m *tb.Message) {
+	bot.Handle("/list_peers", func(message *tb.Message) {
 		log.Println("Received get_peers command")
-		if UsernameValid(m) {
-			GetPeersHandler(b,c,m)
+		if UsernameValid(message) {
+			GetPeersHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/get_address", func(m *tb.Message) {
+	bot.Handle("/get_address", func(message *tb.Message) {
 		log.Println("Received get_address command")
-		if UsernameValid(m) {
-			NewAddressHandler(b,c,m)
+		if UsernameValid(message) {
+			NewAddressHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/wallet_balance",func(m *tb.Message) {
+	bot.Handle("/wallet_balance",func(message *tb.Message) {
 		log.Println("Received wallet_balance command")
-		if UsernameValid(m) {
-			WalletBalanceHandler(b,c,m)
+		if UsernameValid(message) {
+			WalletBalanceHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/list_chain_txns",func(m *tb.Message) {
+	bot.Handle("/list_chain_txns",func(message *tb.Message) {
 		log.Println("Received list_chain_txns command")
-		if UsernameValid(m) {
-			ListChainTxnsHandler(b,c,m)
+		if UsernameValid(message) {
+			ListChainTxnsHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/send_coins",func(m *tb.Message) {
+	bot.Handle("/send_coins",func(message *tb.Message) {
 		log.Println("Received send_coins command")
-		if UsernameValid(m) {
-			SendCoinsHandler(b,c,m)
+		if UsernameValid(message) {
+			SendCoinsHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/connect_peer",func(m *tb.Message) {
+	bot.Handle("/connect_peer",func(message *tb.Message) {
 		log.Println("Received connect_peer command")
-		if UsernameValid(m) {
-			ConnectPeerHandler(b,c,m)
+		if UsernameValid(message) {
+			ConnectPeerHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/open_channel",func(m *tb.Message) {
+	bot.Handle("/open_channel",func(message *tb.Message) {
 		log.Println("Received open_channel command")
-		if UsernameValid(m) {
-			OpenChannelHandler(b,c,m)
+		if UsernameValid(message) {
+			OpenChannelHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/channel_balance",func(m *tb.Message) {
+	bot.Handle("/channel_balance",func(message *tb.Message) {
 		log.Println("Received channel_balance command")
-		if UsernameValid(m) {
-			ChannelBalanceHandler(b,c,m)
+		if UsernameValid(message) {
+			ChannelBalanceHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/generate_invoice", func(m *tb.Message) {
+	bot.Handle("/generate_invoice", func(message *tb.Message) {
 		log.Println("Received generate_invoice command")
-		if UsernameValid(m) {
-			GenerateInvoiceHandler(b,c,m)
+		if UsernameValid(message) {
+			GenerateInvoiceHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/list_invoices",func(m *tb.Message) {
+	bot.Handle("/list_invoices",func(message *tb.Message) {
 		log.Println("Received list_invoices command")
-		if UsernameValid(m) {
-			ListInvoicesHandler(b,c,m)
+		if UsernameValid(message) {
+			ListInvoicesHandler(bot,client,message)
 		}
 	})
 
-	b.Handle("/lookup_invoice",func(m *tb.Message) {
+	bot.Handle("/lookup_invoice",func(message *tb.Message) {
 		log.Println("Received lookup_invoice command")
-		if UsernameValid(m) {
-			LookupInvoice(b,c,m)
+		if UsernameValid(message) {
+			LookupInvoice(bot,client,message)
+		}
+	})
+
+	bot.Handle("/list_payments",func(message *tb.Message) {
+		log.Println("Received list_payments command")
+		if UsernameValid(message) {
+			ListPaymentsHandler(bot,client,message)
+		}
+	})
+
+	bot.Handle("/close_channel",func(message *tb.Message) {
+		log.Println("Received close_channel command")
+		if UsernameValid(message) {
+			CloseChannelHandler(bot,client,message)
+		}
+	})
+
+	bot.Handle("/list_channels",func(message *tb.Message) {
+		log.Println("Received list_channels command")
+		if UsernameValid(message) {
+			ListChannelsHandler(bot,client,message)
 		}
 	})
 
