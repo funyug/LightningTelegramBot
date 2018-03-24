@@ -17,7 +17,6 @@ Setup
 * Clone the project
 * Run "dep ensure" to install the dependencies
 * Create a telegram bot by visiting https://t.me/botfather and get the token for the bot
-* Modify the token for bot in server.go
 * Build binary using Go build
     
 Start the bot by running
